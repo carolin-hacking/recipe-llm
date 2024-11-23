@@ -32,4 +32,4 @@ with col1:
         st.text(img_path.name)
         st.image(str(img_path))
 with col2:
-    st.text(Path(row["Transcription path"]).read_text())
+    st.write(Path(row["Transcription path"]).read_text())
