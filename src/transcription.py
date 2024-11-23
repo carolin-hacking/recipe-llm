@@ -70,7 +70,7 @@ def ask_question_about_images(image_paths: Union[List[Union[str, Path]], Union[s
     return response.choices[0].message.content
 
 
-def transcribe_image_set(image_paths: Union[List[Union[str, Path]], Union[str, Path]], output_file_name: str) -> str:
+def transcribe_image_set(image_paths: Union[List[Union[str, Path]], Union[str, Path]], output_file_name: str, overwrite: bool = False) -> str:
     """
     Transcribe the text in the image.
     
@@ -80,7 +80,13 @@ def transcribe_image_set(image_paths: Union[List[Union[str, Path]], Union[str, P
     Returns:
         The transcribed text.
     """
+    output_path = Path("data/responses/transcriptions/") / f"{output_file_name}.txt"
+    if output_path.exists() and not overwrite:
+        print(colored(f"Skipping {output_file_name} because it already exists", "yellow"))
+        return
+
     Path("data/responses/transcriptions/").mkdir(parents=True, exist_ok=True)
+    
     question = "Please transcribe the text in the images."
     answer = ask_question_about_images(image_paths, question)
 
