@@ -1,11 +1,15 @@
 import base64
+import json
 from pathlib import Path
 from typing import Union
 from openai import OpenAI
 
-AVOID_API_CALLS = True
+AVOID_API_CALLS = False
 
 def ask_question_about_image(image_path: Union[str, Path], question: str) -> str:
+    if not isinstance(image_path, Path):
+        image_path = Path(image_path)
+    
     if AVOID_API_CALLS:
         return open("data/example_response.txt", "r").read()
     
@@ -33,7 +37,20 @@ def ask_question_about_image(image_path: Union[str, Path], question: str) -> str
         ]
     )
 
-    with open("response.txt", "w") as file:
-        file.write(str(response))
+    response_info = {
+        "question": question,
+        "image_name": image_path.name,
+        "response": str(response)
+    }
+
+    with open(f"response_{question}_{image_path.name}.json", "w") as file:
+        json.dump(response_info, file)
 
     return response.choices[0].message.content
+
+
+if __name__ == "__main__":
+    image_path = "data/recipe_images/PXL_20241123_132750395.jpg"
+    question = "Please transcribe the text in the image."
+    response = ask_question_about_image(image_path, question)
+    print(response)
