@@ -5,6 +5,8 @@ from typing import Union
 from openai import OpenAI
 from datetime import datetime
 
+from tqdm import tqdm
+
 AVOID_API_CALLS = False
 
 def ask_question_about_image(image_path: Union[str, Path], question: str) -> str:
@@ -51,8 +53,27 @@ def ask_question_about_image(image_path: Union[str, Path], question: str) -> str
     return response.choices[0].message.content
 
 
-if __name__ == "__main__":
-    image_path = "data/recipe_images/PXL_20241123_132750395.jpg"
+def transcribe_image(image_path: Union[str, Path]) -> str:
+    """
+    Transcribe the text in the image.
+    
+    Args:
+        image_path: Path to the image file.
+        
+    Returns:
+        The transcribed text.
+    """
+    Path("data/responses/transcriptions/").mkdir(parents=True, exist_ok=True)
     question = "Please transcribe the text in the image."
-    response = ask_question_about_image(image_path, question)
-    print(response)
+    answer = ask_question_about_image(image_path, question)
+
+    with open(f"data/responses/transcriptions/{image_path.name}.txt", "w") as file:
+        file.write(answer)
+    return answer
+
+
+if __name__ == "__main__":
+    for image_path in tqdm(Path("data/recipe_images").glob("*.jpg"), desc="Transcribing images in data/recipe_images"):
+        response_message = transcribe_image(image_path)
+
+        print(response_message)

@@ -167,3 +167,4 @@ cython_debug/
 *.gif
 *.mp3
 *.wav
+.DS_Store
