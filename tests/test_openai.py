@@ -1,6 +1,8 @@
+import numpy as np
 from openai import OpenAI
 
 from src.transcription import ask_question_about_image
+from src.openai import get_embedding
 
 
 def test_openai_key_works():
@@ -32,3 +34,10 @@ def test_openai_request_with_image():
     response = ask_question_about_image(image_path, question)
     assert isinstance(response, str)
     assert response != ""
+
+
+def test_embed_texts():
+    texts = ["The dog barks while it runs!", "A cloud does its laundry in the sky."]
+    embeds: np.ndarray = get_embedding(texts=texts)
+    embed_dim = 1536  # see dims in https://platform.openai.com/docs/guides/embeddings
+    assert embeds.shape == (len(texts), embed_dim)
