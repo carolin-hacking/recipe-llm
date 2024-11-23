@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from typing import Union
 from openai import OpenAI
+from datetime import datetime
 
 AVOID_API_CALLS = False
 
@@ -40,12 +41,13 @@ def ask_question_about_image(image_path: Union[str, Path], question: str) -> str
     response_info = {
         "question": question,
         "image_name": image_path.name,
-        "response": str(response)
+        "response": response.to_dict(),
+        "answer": response.choices[0].message.content
     }
-
-    with open(f"response_{question}_{image_path.name}.json", "w") as file:
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M_%S")
+    with open(f"data/responses/{timestamp}_response.json", "w") as file:
         json.dump(response_info, file)
-
     return response.choices[0].message.content
 
 
