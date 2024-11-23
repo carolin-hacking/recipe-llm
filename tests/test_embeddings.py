@@ -9,14 +9,12 @@ def test_embeddings_container():
 
     assert isinstance(e.get_embeds(0), np.ndarray)
 
-    closest = e.get_closest(to_idx=0)
-    assert isinstance(closest, list)
-    assert closest[0] != 0
+    (closest, score), *_ = e.get_closest(to_idx=0)
+    assert closest != 0
+    assert 0 < score < 1
 
 
 def test_rank_similarity():
     similarities = np.array([0.1, 0.9, 0.8])
-    ranks = np.array([1, 2, 0])
-    assert np.allclose(ranks, rank_similarities(similarities))
-
-
+    most_similar = np.array([1, 2, 0])
+    assert np.allclose(most_similar, rank_similarities(similarities))

@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Iterable
 
 import numpy as np
 
@@ -17,13 +18,16 @@ class Embeddings:
     def get_embeds(self, index: int) -> np.ndarray:
         return self.emebds[index]
 
-    def get_closest(self, to_idx: int) -> list[int]:
+    def get_closest(self, to_idx: int) -> Iterable[tuple[int, float]]:
         assert 0 <= to_idx
         assert to_idx < len(self.emebds)
         single_emb = self.emebds[to_idx]
         similarities = self.emebds @ single_emb
-        ranks = rank_similarities(similarities)
-        return [r for r in ranks if r != to_idx]
+        most_similar = rank_similarities(similarities)
+        for rank in most_similar:
+            if rank == to_idx:
+                continue
+            yield rank, similarities[rank]
 
 
 def rank_similarities(sims: np.ndarray) -> np.ndarray:
