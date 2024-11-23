@@ -13,10 +13,13 @@ data_dir = Path(__file__).parent / "data"
 imgs_dir = data_dir / "recipe_images"
 transcriptions_dir = data_dir / "responses" / "transcriptions"
 
-transcriptions = [str(f) for f in transcriptions_dir.glob("*.txt")]
-tdf = pd.DataFrame({"Transcription path": transcriptions, "images_folder": [get_images_folder_name(f) for f in transcriptions]})
-event = st.dataframe(tdf, on_select="rerun", selection_mode="single-row")
+transcription_files = [str(f) for f in transcriptions_dir.glob("*.txt")]
+tdf = pd.DataFrame({
+    "Transcription path": transcription_files,
+    "Folder with images": [get_images_folder_name(f) for f in transcription_files]
+})
 
+event = st.dataframe(tdf, on_select="rerun", selection_mode="single-row")
 if 0 == len(event["selection"]["rows"]):
     st.info("Please select a row")
     st.stop()
