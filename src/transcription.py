@@ -1,13 +1,16 @@
 import base64
 import json
 from pathlib import Path
+from termcolor import colored
 from typing import List, Union
+from langfuse.openai import OpenAI as LangfuseOpenAI
 from openai import OpenAI
 from datetime import datetime
 
 from tqdm import tqdm
 
 AVOID_API_CALLS = False
+
 
 def get_image_content_item(image_path: Union[str, Path]) -> str:
     if not isinstance(image_path, Path):
@@ -30,19 +33,29 @@ def ask_question_about_images(image_paths: Union[List[Union[str, Path]], Union[s
     if not isinstance(image_paths, list):
         image_paths = [image_paths]
 
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": question},
-                    *[get_image_content_item(image_path) for image_path in image_paths]
-                ]
-            }
-        ]
-    )
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": question},
+                *[get_image_content_item(image_path) for image_path in image_paths]
+            ]
+        }
+    ]
+    try:
+        client = LangfuseOpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages
+        )
+    except Exception as e:
+        # if langfuse is out of credits, use the openai client directly
+        print(colored(f"Error: {e}", "red"))
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages
+        )
 
     response_info = {
         "question": question,
@@ -77,7 +90,7 @@ def transcribe_image_set(image_paths: Union[List[Union[str, Path]], Union[str, P
 
 
 if __name__ == "__main__":
-    for recipe_directory in Path("data/recipe_images").glob("*"):
+    for recipe_directory in tqdm(Path("data/recipe_images").glob("*"), desc="Transcribing recipes"):
         if recipe_directory.is_dir():
             images_of_recipe = list(Path(recipe_directory).glob("*.jpg"))
             transcribe_image_set(images_of_recipe, f"recipe_{recipe_directory.name}")

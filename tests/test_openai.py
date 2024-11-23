@@ -1,7 +1,8 @@
+from pathlib import Path
 import numpy as np
 from openai import OpenAI
 
-from src.transcription import ask_question_about_image
+from src.transcription import ask_question_about_images
 from src.openai_interaction import get_embedding
 
 
@@ -29,9 +30,9 @@ def test_openai_key_works():
     
 def test_openai_request_with_image():
     question = "What is in this image?"
-    image_path = "data/recipe_images/PXL_20241123_132750395.jpg"
+    image_path = Path("data/recipe_images/0/PXL_20241123_132750395.jpg")
     
-    response = ask_question_about_image(image_path, question)
+    response = ask_question_about_images(image_path, question)
     assert isinstance(response, str)
     assert response != ""
 
