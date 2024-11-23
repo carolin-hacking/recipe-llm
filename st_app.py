@@ -28,7 +28,7 @@ row: dict = tdf.loc[event["selection"]["rows"][0]].to_dict()
 
 col1, col2 = st.columns(2)
 with col1:
-    for img_path in Path(row["images_folder"]).glob("*.jpg"):
+    for img_path in Path(row["Folder with images"]).glob("*.jpg"):
         st.text(img_path.name)
         st.image(str(img_path))
 with col2:
