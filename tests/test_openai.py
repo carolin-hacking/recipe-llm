@@ -2,7 +2,7 @@ import numpy as np
 from openai import OpenAI
 
 from src.transcription import ask_question_about_image
-from src.openai import get_embedding
+from src.openai_interaction import get_embedding
 
 
 def test_openai_key_works():
